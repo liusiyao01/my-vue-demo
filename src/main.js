@@ -3,13 +3,13 @@
 import Vue from 'vue';
 import Layout from './components/layout';
 import VRouter from 'vue-router';
-import Vuex from 'vuex';
+import VueResource from 'vue-resource';
 
 // components
 import IndexPage from './page/index';
 
 Vue.use(VRouter);
-Vue.use(Vuex);
+Vue.use(VueResource);
 
 let router = new VRouter({
   mode: 'history',
