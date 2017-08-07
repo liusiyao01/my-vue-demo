@@ -6,16 +6,16 @@
         <div class="g-form-input">
           <input type="text"
                  v-model="usernameModel" placeholder="请输入用户名"/>
-          <span class="g-form-error">{{ Errors.userErrorText }}</span>
         </div>
+        <span class="g-form-error">{{ userError.userErrorText }}</span>
       </div>
       <div class="g-form-line">
         <span class="g-form-label">密码:</span>
         <div class="g-form-input">
           <input type="password"
                  v-model="passwordModel" placeholder="请输入密码"/>
-          <span class="g-form-error">{{ Errors.psdErrorText }}</span>
         </div>
+        <span class="g-form-error">{{ passwordError.psdErrorText}}</span>
       </div>
       <div class="g-form-line">
         <div class="g-form-btn">
@@ -37,27 +37,54 @@
       };
     },
     computed: {
-      Errors() {
-        let userErrorText, psdErrorText;
+      userError() {
+        let status, userErrorText;
         if (!/@/g.test(this.usernameModel)) {
-          userErrorText = '不包含@';
-        } else if (!/^\w{1,6}$/g.test(this.passwordModel)) {
-          psdErrorText = '密码1-6位';
+            status = false;
+            userErrorText = '用户名包含@';
         } else {
+            status = true;
+            userErrorText = '';
+        }
+        if (!this.userFlag) {
           userErrorText = '';
-          psdErrorText = '';
+          this.userFlag = true;
+        } else if (this.usernameModel === '') {
+          userErrorText = '用户名不得为空';
         }
         return {
-          userErrorText,
-          psdErrorText
+          status, userErrorText
+        };
+      },
+      passwordError() {
+        let status, psdErrorText;
+        if (!/^\w{1,6}$/g.test(this.passwordModel)) {
+          status = false;
+          psdErrorText = '密码1-6位';
+        } else {
+          status = true;
+          psdErrorText = '';
+        }
+        if (!this.psdFlag) {
+          psdErrorText = '';
+          this.psdFlag = true;
+        }
+        return {
+          status, psdErrorText
         };
       }
     },
     methods: {
       onSubmit() {
-        if (!this.Errors.userErrorText || !this.Errors.psdErrorText) {
+        if (!this.userError.status || !this.passwordError.status) {
           this.errorText = '无法提交';
         }
+        this.$http.get('api/login').then((res) => {
+          console.log(res);
+          this.$emit('has-log', res.body.username);
+        }, (error) => {
+          console.log(error);
+        });
       }
     }
   };
